@@ -41,7 +41,7 @@ void cargarTareas(Tarea *Tareas, int cantidadTareas)
 }
 void mostrarTarea(Tarea *aMostrar)
 {
-    cout<<"Tarea ID: "<<(*aMostrar).TareaID<<'\n';
+    cout<<"\nTarea ID: "<<(*aMostrar).TareaID<<'\n';
     cout<<"Descripción: "<<(*aMostrar).Descripcion<<'\n';
     cout<<"Duración: "<<(*aMostrar).Duracion<<'\n';
 }
@@ -79,6 +79,15 @@ void listarTareas(Tarea *Tareas, int cantidadTareas)
     }
 }
 
+Tarea buscarTarea(Tarea *Tareas, int cantidadTareas, int TareaID)
+{
+    forn(i, cantidadTareas)
+    {
+        if(Tareas[i].TareaID == TareaID) return Tareas[i];
+    }
+    cout<<"No se encontró la tarea buscada.\n";
+}
+
 int main(int argc, char const *argv[]){
     srand(time(0));
     imprimirTitulo("Módulo ToDo");
@@ -94,6 +103,8 @@ int main(int argc, char const *argv[]){
     listarTareas(TareasRealizadas, cantidadTareas);
     imprimirTitulo("Tareas Pendientes");
     listarTareas(TareasPendientes, cantidadTareas);
+    Tarea tareaBuscada = buscarTarea(TareasPendientes, cantidadTareas, 2);
+    if(tareaBuscada.TareaID != NULL) mostrarTarea(&tareaBuscada);
     free(TareasPendientes);
     free(TareasRealizadas);
     getchar();

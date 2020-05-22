@@ -34,14 +34,14 @@ void cargarTareas(Tarea *Tareas, int cantidadTareas)
         Tareas[i].Duracion = rand()%91+10;
         Tareas[i].Descripcion = (char *)malloc(200*sizeof(char));
         cout<<"Por favor, ingrese la descripción de la tarea: ";
-        cin>>Tareas[i].Descripcion;
+        cin.getline(Tareas[i].Descripcion, 200);
         fflush(stdin);
     }
     imprimirTitulo("Tareas cargadas correctamente");
 }
 void mostrarTarea(Tarea *aMostrar)
 {
-    cout<<"Tarea ID: "<<(*aMostrar).TareaID<<'\n';
+    cout<<"\nTarea ID: "<<(*aMostrar).TareaID<<'\n';
     cout<<"Descripción: "<<(*aMostrar).Descripcion<<'\n';
     cout<<"Duración: "<<(*aMostrar).Duracion<<'\n';
 }
@@ -79,6 +79,17 @@ void listarTareas(Tarea *Tareas, int cantidadTareas)
     }
 }
 
+Tarea buscarTarea(Tarea *Tareas, int cantidadTareas, char *palabraClave)
+{   
+    char *pos;
+    forn(i, cantidadTareas)
+    {
+        pos = strstr(Tareas[i].Descripcion, palabraClave);
+        if(pos!=NULL) return Tareas[i];
+    }
+    cout<<"La tarea buscada no fue encontrada.";
+}
+
 int main(int argc, char const *argv[]){
     srand(time(0));
     imprimirTitulo("Módulo ToDo");
@@ -94,6 +105,8 @@ int main(int argc, char const *argv[]){
     listarTareas(TareasRealizadas, cantidadTareas);
     imprimirTitulo("Tareas Pendientes");
     listarTareas(TareasPendientes, cantidadTareas);
+    Tarea tareaBuscada = buscarTarea(TareasPendientes, cantidadTareas, "lavar");
+    if(tareaBuscada.TareaID != NULL) mostrarTarea(&tareaBuscada);
     free(TareasPendientes);
     free(TareasRealizadas);
     getchar();

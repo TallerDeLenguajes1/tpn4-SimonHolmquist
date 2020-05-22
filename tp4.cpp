@@ -79,7 +79,7 @@ void listarTareas(Tarea *Tareas, int cantidadTareas)
     }
 }
 
-Tarea buscarTarea(Tarea *Tareas, int cantidadTareas, char *palabraClave)
+Tarea BusquedaPorPalabra(Tarea *Tareas, int cantidadTareas, char *palabraClave)
 {   
     char *pos;
     forn(i, cantidadTareas)
@@ -88,6 +88,15 @@ Tarea buscarTarea(Tarea *Tareas, int cantidadTareas, char *palabraClave)
         if(pos!=NULL) return Tareas[i];
     }
     cout<<"La tarea buscada no fue encontrada.";
+}
+
+Tarea BusquedaPorId(Tarea *Tareas, int cantidadTareas, int TareaID)
+{
+    forn(i, cantidadTareas)
+    {
+        if(Tareas[i].TareaID == TareaID) return Tareas[i];
+    }
+    cout<<"No se encontró la tarea buscada.\n";
 }
 
 int main(int argc, char const *argv[]){
@@ -105,7 +114,10 @@ int main(int argc, char const *argv[]){
     listarTareas(TareasRealizadas, cantidadTareas);
     imprimirTitulo("Tareas Pendientes");
     listarTareas(TareasPendientes, cantidadTareas);
-    Tarea tareaBuscada = buscarTarea(TareasPendientes, cantidadTareas, "lavar");
+    Tarea tareaBuscada;
+    tareaBuscada = BusquedaPorPalabra(TareasPendientes, cantidadTareas, "lavar");
+    if(tareaBuscada.TareaID != NULL) mostrarTarea(&tareaBuscada);
+    tareaBuscada = BusquedaPorId(TareasPendientes, cantidadTareas, 2);
     if(tareaBuscada.TareaID != NULL) mostrarTarea(&tareaBuscada);
     free(TareasPendientes);
     free(TareasRealizadas);

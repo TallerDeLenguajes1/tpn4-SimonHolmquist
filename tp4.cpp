@@ -150,3 +150,11 @@ int main(int argc, char const *argv[]){
     getchar();
     return 0;
 }
+
+/*
+comentario
+para
+ver
+que
+onda
+*/

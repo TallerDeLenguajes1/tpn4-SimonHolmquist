@@ -165,3 +165,6 @@ int main(int argc, char const *argv[]){
     getchar();
     return 0;
 }
+/*
+otro comentario inutil
+*/

@@ -9,35 +9,55 @@
 
 using namespace std;
 
-struct Tarea
-{
+struct Tarea{
     int TareaID; //Numerado en ciclo iterativo
     char *Descripcion; //
     int Duracion; // entre 10 – 100
-}; 
+};
 
+struct Nodo{
+    Tarea T;
+    Nodo *Siguiente;
+};
+ 
 void imprimirTitulo(char *s)
 {
     int n = strlen(s)+4;
+    cout<<'\n';
     forn(i,n) cout<<'*';
     cout<<"\n* "<<s<<" *\n";
     forn(i,n) cout<<'*';
     cout<<"\n\n";
 }
+void poner(Nodo **Tareas, Tarea nuevaTarea)
+{
+    Nodo *nuevo = (Nodo *)malloc(sizeof(Tarea));
+    nuevo->T = nuevaTarea;
+    nuevo->Siguiente = *Tareas;
+    *Tareas = nuevo;
+}
 
-void cargarTareas(Tarea **Tareas, int cantidadTareas)
+Tarea sacar(Nodo **Tareas)
+{
+    Tarea aSacar = (*Tareas)->T;
+    *Tareas = (*Tareas)->Siguiente;
+    return aSacar;
+}
+
+void cargarTareas(Nodo **Tareas, int cantidadTareas)
 {
     imprimirTitulo("Carga de tareas");
     forn(i, cantidadTareas)
     {
-        Tareas[i] = (Tarea *)malloc(sizeof(Tarea));
+        Tarea nuevaTarea;
         cout<<"Tarea N°"<<i+1<<'\n';
-        Tareas[i]->TareaID = i+1;
-        Tareas[i]->Duracion = rand()%91+10;
-        Tareas[i]->Descripcion = (char *)malloc(200*sizeof(char));
+        nuevaTarea.TareaID = i+1;
+        nuevaTarea.Duracion = rand()%91+10;
+        nuevaTarea.Descripcion = (char *)malloc(200*sizeof(char));
         cout<<"Por favor, ingrese la descripción de la tarea: ";
-        cin.getline(Tareas[i]->Descripcion, 200);
+        cin.getline(nuevaTarea.Descripcion, 200);
         fflush(stdin);
+        poner(Tareas, nuevaTarea);
     }
     imprimirTitulo("Tareas cargadas correctamente");
 }
@@ -49,14 +69,15 @@ void mostrarTarea(Tarea aMostrar)
     cout<<"Duración: "<<aMostrar.Duracion<<'\n';
 }
 
-void checkeoDeTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int cantidadTareas)
+void checkeoDeTareas(Nodo **TareasPendientes, Nodo **TareasRealizadas)
 {
     imprimirTitulo("Checkeo de tareas");
     int opcion;
-    forn(i, cantidadTareas)
+    Nodo *pendientes = NULL;
+    while(*TareasPendientes != NULL)
     {
         opcion = 0;
-        mostrarTarea(*TareasPendientes[i]);
+        mostrarTarea((*TareasPendientes)->T);
         cout<<"¿La tarea fue realizada? Elija la opción.\n1. SI\n2. NO\n";
         cin>>opcion;
         while(opcion!=1 && opcion!=2)
@@ -64,65 +85,61 @@ void checkeoDeTareas(Tarea **TareasPendientes, Tarea **TareasRealizadas, int can
             cout<<"La opción ingresada es incorrecta. Ingrese nuevamente.\n1. SI\n2. NO\n";
             cin>>opcion;
         }
-        if(opcion == 1)
-        {
-            TareasRealizadas[i] = TareasPendientes[i];
-            TareasPendientes[i] = NULL;
-        }
-        else TareasRealizadas[i] = NULL;
+        if(opcion == 1) poner(TareasRealizadas, sacar(TareasPendientes));
+        else poner(&pendientes, sacar(TareasPendientes));
     }
+    *TareasPendientes = pendientes;   
     imprimirTitulo("Tareas checkeadas correctamente");
 }
 
-void listarTareas(Tarea **Tareas, int cantidadTareas)
+void listarTareas(Nodo **Tareas)
 {
-    forn(i, cantidadTareas)
+    Nodo *aux = *Tareas;
+    while(aux != NULL)
     {
-        if(Tareas[i] != NULL) mostrarTarea(*Tareas[i]);
+        mostrarTarea(aux->T);
+        aux = aux->Siguiente;
     }
 }
 
-Tarea* BusquedaPorPalabra(Tarea **Tareas, int cantidadTareas)
+Nodo* BusquedaPorPalabra(Nodo **Tareas)
 {   
     imprimirTitulo("Busqueda por palabra clave");
     char *palabraClave = (char *)malloc(sizeof(char)*200);
     cout<<"Ingrese palabra clave: ";
     cin>>palabraClave;
     char *pos;
-    forn(i, cantidadTareas)
+    Nodo *aux = *Tareas;
+    while(aux != NULL)
     {
-        if(Tareas[i] != NULL)
-        {
-            pos = strstr(Tareas[i]->Descripcion, palabraClave);
-            if(pos != NULL){
-                printf("Tarea encontrada.\n");
-                return Tareas[i];
-            }
+        pos = strstr(aux->T.Descripcion, palabraClave);
+        if(pos != NULL){
+            printf("Tarea encontrada.\n");
+            return aux;
         }
+        aux = aux->Siguiente;
     }
-    cout<<"La tarea buscada no fue encontrada.\n";
-    return NULL;
+    return aux;
 }
 
-Tarea* BusquedaPorId(Tarea **Tareas, int cantidadTareas)
+Nodo* BusquedaPorId(Nodo **Tareas)
 {
     imprimirTitulo("Busqueda por ID");
     int TareaID;
     cout<<"Ingrese ID: ";
     cin>>TareaID;
-    forn(i, cantidadTareas)
+    Nodo *aux = *Tareas;
+    while(aux != NULL)
     {
-        if(Tareas[i] != NULL)
+        if(aux->T.TareaID == TareaID)
         {
-            if(Tareas[i]->TareaID == TareaID)
-            {
-                printf("Tarea encontrada.\n");
-                return Tareas[i];
-            }
+            printf("Tarea encontrada.\n");
+            return aux;
         }
+        aux = aux->Siguiente;
     }
     cout<<"La tarea buscada no fue encontrada.\n";
-    return NULL;
+    return aux;
 }
 
 int main(int argc, char const *argv[]){
@@ -132,21 +149,19 @@ int main(int argc, char const *argv[]){
     cout<<"Ingrese la cantidad de Tareas a cargar\n";
     cin>>cantidadTareas;
     fflush(stdin);
-    Tarea **TareasPendientes = (Tarea **)malloc(cantidadTareas*sizeof(Tarea*));
-    Tarea **TareasRealizadas = (Tarea **)malloc(cantidadTareas*sizeof(Tarea*));
-    cargarTareas(TareasPendientes, cantidadTareas);
-    checkeoDeTareas(TareasPendientes, TareasRealizadas, cantidadTareas);
+    Nodo *TareasPendientes = NULL;
+    Nodo *TareasRealizadas = NULL;
+    cargarTareas(&TareasPendientes, cantidadTareas);
+    checkeoDeTareas(&TareasPendientes, &TareasRealizadas);
     imprimirTitulo("Tareas Realizadas");
-    listarTareas(TareasRealizadas, cantidadTareas);
+    listarTareas(&TareasRealizadas);
     imprimirTitulo("Tareas Pendientes");
-    listarTareas(TareasPendientes, cantidadTareas);
-    Tarea *tareaBuscada = (Tarea *)malloc(sizeof(Tarea));
-    tareaBuscada = BusquedaPorPalabra(TareasPendientes, cantidadTareas);
-    if(tareaBuscada != NULL) mostrarTarea(*tareaBuscada);
-    tareaBuscada = BusquedaPorId(TareasPendientes, cantidadTareas);
-    if(tareaBuscada != NULL) mostrarTarea(*tareaBuscada);
-    free(TareasPendientes);
-    free(TareasRealizadas);
+    listarTareas(&TareasPendientes);
+    Nodo* tareaBuscada;
+    tareaBuscada = BusquedaPorPalabra(&TareasPendientes);
+    if(tareaBuscada != NULL) mostrarTarea(tareaBuscada->T);
+    tareaBuscada = BusquedaPorId(&TareasPendientes);
+    if(tareaBuscada != NULL) mostrarTarea(tareaBuscada->T);
     getchar();
     return 0;
 }
